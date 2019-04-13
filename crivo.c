@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <locale.h>
-#define NUM 100000000
+#define NUM 100
 #define NUM_THREAD 4
 
 /*												LÓGICA DO PROGRAMA
@@ -20,6 +20,7 @@ Com 3 threads: 9,6660
 Com 4 threads: 9.7030*/
 
 int vetor[NUM];
+pthread_barrier_t barreira;
 
 /*Função responsável por pegar um valor base (k) e marcar todos os seus múltiplos como não primos, a partir de k²*/
 void *funcao_crivo(void *arg){
@@ -28,6 +29,19 @@ void *funcao_crivo(void *arg){
 	int k=pthread_self()+1;
 	int i;
 	//printf("O valor de k é: %d na thread: %d\n",k,pthread_self());
+	
+	//Assume-se em primeira instância que todos os números são primos, logo toda posição do vetor recebe o valor 1
+	for(i=pthread_self()-1;i<NUM;i=i+NUM_THREAD){
+		vetor[i]=1;
+		//printf("olá thread: %d na posição: %d com o valor: %d\n", pthread_self(), i, vetor[i]);
+	}
+	
+	
+	printf("thread: %d esperando\n", pthread_self());
+	/*BARREIRA AQUI para esperar o preenchimento do vetor*/ 
+	pthread_barrier_wait(&barreira);
+	printf("thread: %d foi\n", pthread_self());
+	
 	
 	//A partir de k até o valor máximo divido por k, altera no vetor o valor para 0 dos múltiplos de k
 	while(k <= sqrt(NUM)) {
@@ -44,11 +58,8 @@ int main(){
 	setlocale(LC_ALL, "Portuguese");	
 	int i;	
 	pthread_t crivo[NUM_THREAD];
+	pthread_barrier_init(&barreira, NULL, NUM_THREAD);
 	
-	//Assume-se em primeira instância que todos os números são primos, logo toda posição do vetor recebe o valor 1
-	for(i=0;i<NUM;i++){
-		vetor[i]=1;
-	}
 	
 	//Criação das threads
 	for(i=0;i<NUM_THREAD;i++){
@@ -59,13 +70,18 @@ int main(){
 		pthread_join(crivo[i],NULL);
 	}
 
+	//Imprime o vetor inteiro
+	for(i=0;i<NUM;i++){
+		printf("posição do vetor:%d  valor do vetor:%d\n",i,vetor[i]);	
+	}
+
 	//Imprime apenas os números primos	
-	/*printf ("Os números primos até %d são: ",NUM);
+	printf ("Os números primos até %d são: ",NUM);
 	for(i=0;i<NUM;i++){
 		if(vetor[i]==1){
 			printf("%d ",i+1);	
 		}
-	}*/
+	}
 	
 	return 0;
 }
