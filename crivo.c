@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <math.h>
 #include <locale.h>
-#define NUM 30
-#define NUM_THREAD 2
+#define NUM 100
+#define NUM_THREAD 4
 
 /*												LÓGICA DO PROGRAMA
 Ter um vetor em que cada posição represente o número posterior a ele (posição 0 representa o número 1, posição 99 representa o número 100),
@@ -26,13 +26,17 @@ pthread_barrier_t barreira;
 void *funcao_crivo(void *arg){
 	//printf("thread %d mandando um olá.\n",pthread_self());
 	//Cada thread possui um k próprio pulando o k=1
-	int k=pthread_self()+1;
+	int k=pthread_self()+pthread_self()+1;
 	int i;
 	//printf("O valor de k é: %d na thread: %d\n",k,pthread_self());
 	
 	//Assume-se em primeira instância que todos os números são primos, logo toda posição do vetor recebe o valor 1
 	for(i=pthread_self()-1;i<NUM;i=i+NUM_THREAD){
-		vetor[i]=1;
+		if( i%2==0 || i==1){
+			vetor[i]=1;
+		}else{
+			vetor[i]=0;
+		}
 		//printf("olá thread: %d na posição: %d com o valor: %d\n", pthread_self(), i, vetor[i]);
 	}
 	
@@ -71,9 +75,9 @@ int main(){
 	}
 
 	//Imprime o vetor inteiro
-	for(i=0;i<NUM;i++){
-		printf("posição do vetor:%d  valor do vetor:%d\n",i,vetor[i]);	
-	}
+	//for(i=0;i<NUM;i++){
+	//	printf("posição do vetor:%d  valor do vetor:%d\n",i,vetor[i]);	
+	//}
 
 	//Imprime apenas os números primos	
 	printf ("Os números primos até %d são: ",NUM);
