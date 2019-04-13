@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <math.h>
 #include <locale.h>
-#define NUM 100
-#define NUM_THREAD 4
+#define NUM 30
+#define NUM_THREAD 2
 
 /*												LÓGICA DO PROGRAMA
 Ter um vetor em que cada posição represente o número posterior a ele (posição 0 representa o número 1, posição 99 representa o número 100),
